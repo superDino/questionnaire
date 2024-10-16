@@ -2,7 +2,7 @@
 <template>
   <div class="survey-form">
     <h1>XXX调查问卷</h1>
-    <el-form @submit.prevent="handleSubmit" :model="form" label-width="230px" label-position="left" :rules="rules" ref="form">
+    <el-form @submit.prevent="handleSubmit" :model="form" label-width="300px" label-position="left" :rules="rules" ref="form">
       <el-form-item label="您是否有驾照：" required>
         <el-radio-group v-model="form.hasLicense">
           <el-radio label="yes">是</el-radio>
@@ -156,26 +156,11 @@
           </el-checkbox-group>
         </el-form-item>
         <div class="section-title">V2G场景</div>
-        <el-form-item label="如果你的车现在停放在：" required prop="v2gScenarioLocation">
-          <el-radio-group v-model="form.v2gScenarioLocation" placeholder="请选择">
-            <el-radio label="家" value="home"></el-radio>
-            <el-radio label="公司" value="work"></el-radio>
-            <el-radio label="商场" value="mall"></el-radio>
-            <el-radio label="紧急情况" value="emergency"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="剩余电量在：" required prop="v2gScenarioBatteryLevel">
-          <el-radio-group v-model="form.v2gScenarioBatteryLevel" placeholder="请选择">
-            <el-radio label="100-80%" value="100-80%"></el-radio>
-            <el-radio label="80-50%" value="80-50%"></el-radio>
-            <el-radio label="50-30%" value="50-30%"></el-radio>
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item label="以下哪个场景你会选择参与V2G：" required prop="v2gScenarioParticipation">
-          <el-radio-group v-model="form.v2gScenarioParticipation">
-            <el-radio label="noBenefit">参与V2G，没有任何收益</el-radio>
+        <el-form-item :label="v2gScenarioLabel" required prop="v2gParticipate">
+          <el-radio-group v-model="form.v2gParticipate">
+            <el-radio label="participate">参与V2G, {{ v2gBenifit }}</el-radio>
             <el-radio label="noBenefitWithCarbonReduction">参与V2G，没有任何收益，但会显示可以减多少碳</el-radio>
-            <el-radio label="maxDischarge">可接受的最大放电程度</el-radio>
+            <el-radio label="maxDischarge">可接受的最大放电程度（为了保护电池，最低剩余电量为20%）</el-radio>
             <el-radio label="notParticipate">不参与V2G</el-radio>
           </el-radio-group>
         </el-form-item>
@@ -225,11 +210,14 @@ export default {
         reasonToChangeCar: '',
         greenBehavior: '',
         greenActions: [],
-        v2gScenarioLocation: '',
-        v2gScenarioBatteryLevel: '',
-        v2gScenarioParticipation: '',
+        v2gParticipate:'',
         newCarChoice: ''
       },
+      v2gScenarioLabel: '',
+      radomLocation: ['停放在家', '停放在公司', '停放在商场', '处于紧急情况'],
+      radomBatteryLevel: ['100-80%', '80-50%', '50-30%'],
+      radomBenefits: ['没有任何收益', '收益为0.5元每度', '收益为1元每度', '收益为1.5元每度'],
+      v2gBenifit: '',
       rules: {
         hasLicense: [{ required: true, message: '请选择是否有驾照', trigger: 'change' }],
         hasEV: [{ required: true, message: '请选择是否有新能源汽车', trigger: 'change' }],
@@ -247,15 +235,18 @@ export default {
         carAge: [{ required: true, message: '请选择您现在拥有的汽车已经多少年', trigger: 'change' }],
         planToChangeCar: [{ required: true, message: '请选择您计划换车的时间', trigger: 'change' }],
         reasonToChangeCar: [{ required: true, message: '请选择您换车的原因', trigger: 'change' }],
+        greenActions: [{ required: true, message: '请选择日常会做的绿色行为', trigger: 'change' }],
         greenBehavior: [{ required: true, message: '请选择日常生活中是否会有绿色行为', trigger: 'change' }],
-        v2gScenarioLocation: [{ required: true, message: '请选择车停放的位置', trigger: 'change' }],
-        v2gScenarioBatteryLevel: [{ required: true, message: '请选择剩余电量', trigger: 'change' }],
-        v2gScenarioParticipation: [{ required: true, message: '请选择参与V2G的场景', trigger: 'change' }],
+        v2gParticipate: [{ required: true, message: '请选择参与意向', trigger: 'change' }],
         newCarChoice: [{ required: true, message: '请选择新车类型', trigger: 'change' }]
       },
       submitted: false,
       isSubmitting: false
     };
+  },
+  created() {
+      this.v2gScenarioLabel = `如果您的车${this.radomLocation[Math.floor(Math.random() * this.radomLocation.length)]}，剩余电量为${this.radomBatteryLevel[Math.floor(Math.random() * this.radomBatteryLevel.length)]}`;
+      this.v2gBenifit = this.radomBenefits[Math.floor(Math.random() * this.radomBenefits.length)];
   },
   methods: {
     async handleSubmit() {
@@ -284,7 +275,7 @@ export default {
 
 <style scoped>
 .survey-form {
-  max-width: 900px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
   border: 1px solid #ccc;
