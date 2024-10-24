@@ -1,16 +1,17 @@
 <template>
   <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
-  <HomePage />
+  <!-- <WelcomePage /> -->
+  <router-view></router-view>
 </template>
 
 <script>
 // import HelloWorld from './components/HelloWorld.vue'
-import HomePage from './components/HomePage.vue'
+// import WelcomePage from './components/WelcomePage.vue'
 export default {
   name: 'App',
   components: {
     // HelloWorld
-    HomePage
+    // WelcomePage
   }
 }
 </script>
@@ -22,6 +23,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  margin-top: 20px;
 }
 </style>

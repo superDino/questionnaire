@@ -189,6 +189,7 @@
 <script>
 import axios from 'axios';
 export default {
+  name:'HomePage',
   data() {
     return {
       form: {
