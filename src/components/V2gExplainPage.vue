@@ -19,40 +19,84 @@
         </p>
       </div>
       <div class="btn-container">
-        <el-button type="primary" @click="navigateToSurvey">进入问卷</el-button>
+        <el-button
+          :disabled="isButtonDisabled"
+          type="primary"
+          @click="navigateToSurvey"
+        >
+          进入问卷 {{ countdown > 0 ? `(${countdown}s)` : "" }}
+        </el-button>
       </div>
     </div>
   </div>
 </template>
-  
-  <script>
+
+<script>
 export default {
   data() {
     return {
       group: "",
+      isButtonDisabled: true,
+      countdown: 10,
     };
   },
   created() {
     this.assignGroup();
+    this.startCountdown();
   },
   methods: {
     assignGroup() {
       // 随机分配用户到对照组或详细讲解组
       this.group = Math.random() < 0.5 ? "detailed" : "brief";
     },
+    startCountdown() {
+      const interval = setInterval(() => {
+        if (this.countdown > 0) {
+          this.countdown--;
+        } else {
+          this.isButtonDisabled = false;
+          clearInterval(interval);
+        }
+      }, 1000);
+    },
     navigateToSurvey() {
-      this.$router.push({ name: "FourthPage" });
+      this.$router.push({ name: "BasicInfoPage" });
     },
   },
 };
 </script>
+
 <style scoped>
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: #f9f9f9; /* 灰色背景 */
+}
+
+.content-box {
+  max-width: 800px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #e9ecef; /* 灰色框框 */
+  text-align: left;
+}
+
 h1,
 h2 {
   color: #3498db; /* 浅蓝色 */
+  text-align: center
 }
-p{
-    text-align: left;
-    line-height: 26px;
+
+.btn-container {
+  margin-top: 20px;
+}
+
+.el-button {
+  font-size: 18px;
+  padding: 10px 20px;
 }
 </style>

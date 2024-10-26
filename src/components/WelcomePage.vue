@@ -10,7 +10,7 @@
 export default {
   methods: {
     navigateToHomePage() {
-      this.$router.push({ name: "FirstPage" });
+      this.$router.push({ name: "ConditionPage" });
     },
   },
 };

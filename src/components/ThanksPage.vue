@@ -15,7 +15,7 @@ export default {
   name: "ThanksPage",
   methods: {
     handleSubmit() {
-      this.$router.push({ name: "FirstPage" }); // 跳转到问卷页面
+      this.$router.push({ name: "V2gExplainPage" }); // 跳转到问卷页面
     },
   },
 };

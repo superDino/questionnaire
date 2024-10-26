@@ -177,17 +177,17 @@
     },
     methods: {
       handleSubmit() {
-        // this.$refs.form.validate((valid) => {
-        //   if (valid) {
-        //     console.log('表单提交:', this.form);
-        //     this.$router.push({ name: "FifthPage" });
-        //   } else {
-        //     console.log('表单验证失败');
-        //     return false;
-        //   }
-        // });
-        console.log("表单提交:", this.form);
-        this.$router.push({ name: "FifthPage" });
+        this.$refs.form.validate((valid) => {
+          if (valid) {
+            console.log('表单提交:', this.form);
+            this.$router.push({ name: "V2gKnowledgePage" });
+          } else {
+            console.log('表单验证失败');
+            return false;
+          }
+        });
+        // console.log("表单提交:", this.form);
+        // this.$router.push({ name: "V2gKnowledgePage" });
       }
     }
   };

@@ -43,7 +43,7 @@ export default {
     checkEligibility() {
       this.isEligible = this.form.hasLicense && this.form.hasEV;
       if (this.isEligible) {
-        this.$router.push({ name: "SecondPage" });
+        this.$router.push({ name: "ConsentFormPage" });
       }
     },
   },

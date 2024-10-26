@@ -76,7 +76,7 @@ export default {
   methods: {
     submitConsent() {
       if (this.form.name && this.form.date) {
-        this.$router.push({ name: "ThirdPage" });
+        this.$router.push({ name: "V2gExplainPage" });
       } else {
         this.$message.error("请填写完整的姓名和日期");
       }

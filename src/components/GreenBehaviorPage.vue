@@ -76,18 +76,21 @@ export default {
       // this.$refs.form.validate((valid) => {
       //   if (valid) {
       //     console.log("表单提交:", this.form);
-      //     this.$router.push({ name: "SeventhPage" });
+      //     this.$router.push({ name: "V2gScenarioTipsPage" });
       //   } else {
       //     console.log("表单验证失败");
       //     return false;
       //   }
       // });
       console.log("表单提交:", this.form);
-      this.$router.push({ name: "SeventhPage" });
+      this.$router.push({ name: "V2gScenarioTipsPage" });
     },
   },
 };
 </script>
   
   <style scoped>
+h1 {
+  color: #3498db;
+}
 </style>

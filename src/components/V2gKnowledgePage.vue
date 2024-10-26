@@ -10,7 +10,7 @@
         label-position="left"
         @submit.prevent="handleSubmit"
       >
-        <h2>通过刚刚对V2G（车网互动）的了解，您认为V2G（车网互动）</h2>
+        <h3>通过刚刚对V2G（车网互动）的了解，您认为V2G（车网互动）</h3>
         <el-form-item
           label="有助于“6030”计划的成功实施"
           required
@@ -129,7 +129,7 @@
           </el-radio-group>
         </el-form-item>
 
-        <h2>通过刚刚对V2G（车网互动）的了解，您对V2G（车网互动）的担忧</h2>
+        <h3>通过刚刚对V2G（车网互动）的了解，您对V2G（车网互动）的担忧</h3>
         <el-form-item
           label="如果采用双向充电，我会感到自由和独立受到限制"
           required
@@ -222,7 +222,7 @@
           </el-radio-group>
         </el-form-item>
 
-        <h2>通过刚刚对V2G（车网互动）的了解，您更喜欢参与的激励措施</h2>
+        <h3>通过刚刚对V2G（车网互动）的了解，您更喜欢参与的激励措施</h3>
         <el-form-item
           label="我将获得年度奖金"
           required
@@ -410,17 +410,17 @@ export default {
   },
   methods: {
     handleSubmit() {
-      //   this.$refs.form.validate((valid) => {
-      //     if (valid) {
-      //       console.log("表单提交:", this.form);
-      //       this.$router.push({ name: "SixthPage" });
-      //     } else {
-      //       console.log("表单验证失败");
-      //       return false;
-      //     }
-      //   });
-      console.log("表单提交:", this.form);
-      this.$router.push({ name: "SixthPage" });
+        this.$refs.form.validate((valid) => {
+          if (valid) {
+            console.log("表单提交:", this.form);
+            this.$router.push({ name: "GreenBehaviorPage" });
+          } else {
+            console.log("表单验证失败");
+            return false;
+          }
+        });
+      // console.log("表单提交:", this.form);
+      // this.$router.push({ name: "GreenBehaviorPage" });
     },
   },
 };
@@ -428,10 +428,10 @@ export default {
   
   <style scoped>
 h1,
-h2 {
+h3 {
   color: #3498db;
 }
-h2 {
+h3 {
   text-align: left;
 }
 </style>
