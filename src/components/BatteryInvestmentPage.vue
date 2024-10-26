@@ -52,17 +52,17 @@ export default {
   },
   methods: {
     handleSubmit() {
-    //   this.$refs.form.validate((valid) => {
-    //     if (valid) {
-    //       console.log("表单提交:", this.form);
-    //       this.$router.push({ name: "ThanksPage" }); // 跳转到下一个页面
-    //     } else {
-    //       console.log("表单验证失败");
-    //       return false;
-    //     }
-    //   });
-      console.log("表单提交:", this.form);
-      this.$router.push({ name: "ThanksPage" }); // 跳转到下一个页面
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          console.log("表单提交:", this.form);
+          this.$router.push({ name: "ThanksPage" }); // 跳转到下一个页面
+        } else {
+          console.log("表单验证失败");
+          return false;
+        }
+      });
+      // console.log("表单提交:", this.form);
+      // this.$router.push({ name: "ThanksPage" }); // 跳转到下一个页面
     },
   },
 };

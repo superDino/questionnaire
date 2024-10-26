@@ -5,17 +5,16 @@ body{
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100%;
+  justify-content: center; 
+  height: 100vh;
   text-align: center;
 }
 .content-box {
-  height: 800px;
+  height: 100%;
   overflow-y: scroll;
   padding: 20px;
-  width: 1000px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  width: 900px;
+  border: 0, 1px solid #ccc, 0, 1px solid #ccc;
   background-color: #e9ecef;
   /* 灰色框框 */
 }
