@@ -2,8 +2,10 @@
   <div class="page-wrapper">
     <div class="content-box">
       <h1>V2G（车网互动）意愿调查</h1>
+      <p>
+        为了方便您更好的完成实验调查，我们给您提供了V2G的介绍，请您认真阅读，以便了解V2G相关信息。
+      </p>
       <div v-if="group === 'detailed'">
-        <h2>详细讲解</h2>
         <p>
           V2G（Vehicle-to-Grid），即车网互动，是指电动汽车与电网之间的双向能量交换技术。它不仅允许电动车从电网充电，而且还能让电动车在不驾驶时将电能反馈给电网。这一过程为电网提供了调节能力，帮助平衡供需，特别是在高峰时段或可再生能源供电不稳定的情况下。从能量的角度看，每辆车平均电量大于65千瓦时，则3亿辆车载储能容量超过200亿千瓦时，与中国目前每天消费总电量基本相当。从碳减排的角度看，在火电比例约束的情况下，到2050年，与无序充电场景相比，V2G可以减少27%的二氧化碳排放量，年均减碳量可达7亿吨。（中国科学院院士，清华大学车辆与运载学院教授
           欧阳明高，2022）具体来说，V2G技术能显著提高可再生能源的利用率，减少化石燃料发电的依赖，从而减少温室气体排放和空气污染。通过优化电网的能源组合，V2G有助于实现更清洁、更可持续的能源生态系统。此外，V2G还能提高电网的灵活性和稳定性，促进能源的高效利用。
@@ -13,10 +15,12 @@
         </p>
       </div>
       <div v-else>
-        <h2>简短介绍</h2>
         <p>
           V2G即车网互动，是指电动汽车与电网之间的双向能量交换技术。这项技术不仅允许电动汽车从电网充电，还能将车载电池中的电能反馈回电网。既能减轻了电网负担，也为车主带来了经济收益。
         </p>
+      </div>
+      <div class="img-container">
+        <img :src="v2gImageSrc" alt="V2G示意图" />
       </div>
       <div class="btn-container">
         <el-button
@@ -37,12 +41,17 @@ export default {
     return {
       group: "",
       isButtonDisabled: true,
-      countdown: 10,
+      countdown: 5,
     };
   },
   created() {
     this.assignGroup();
     this.startCountdown();
+  },
+  computed: {
+    v2gImageSrc() {
+      return require("@/assets/images/v2gExplain.png");
+    },
   },
   methods: {
     assignGroup() {
@@ -67,28 +76,16 @@ export default {
 </script>
 
 <style scoped>
-.page-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  background-color: #f9f9f9; /* 灰色背景 */
-}
-
 .content-box {
-  max-width: 800px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background-color: #e9ecef; /* 灰色框框 */
   text-align: left;
 }
-
+p {
+  font-size: 20px;
+}
 h1,
 h2 {
   color: #3498db; /* 浅蓝色 */
-  text-align: center
+  text-align: center;
 }
 
 .btn-container {
@@ -98,5 +95,14 @@ h2 {
 .el-button {
   font-size: 18px;
   padding: 10px 20px;
+}
+.img-container {
+  text-align: center;
+}
+
+img {
+  width: 80%;
+  height: auto;
+  margin: 10px auto;
 }
 </style>

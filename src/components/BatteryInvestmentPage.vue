@@ -18,13 +18,24 @@
           <el-radio-group v-model="form.carChoice">
             <el-radio label="similarToCurrent">和现在已有车辆类似</el-radio>
             <el-radio label="largeBatteryWithV2G"
-              >电池容量大 花较多的钱 能参与V2G，有一定的收益</el-radio
+              >电池容量大，花较多的钱购买能参与V2G的电动汽车，获得有一定的收益</el-radio
             >
             <el-radio label="largerBatteryWithMoreV2G"
-              >电池容量大 花更多的钱 更能参与V2G
-              可以接受电池损耗，获得更多的收益</el-radio
+              >电池容量大，花更多的钱购买更能参与V2G的电动汽车。同时，可以接受电池损耗，<br>获得更多的收益</el-radio
             >
-            <el-radio label="notSure">不知道</el-radio>
+            <el-radio label="notSure">我不清楚</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item
+          label="您的参与V2G的预期年收益为："
+          required
+          prop="expectedEarnings"
+        >
+          <el-radio-group v-model="form.expectedEarnings">
+            <el-radio label="5000">5千</el-radio>
+            <el-radio label="5000-10000">5千-1万</el-radio>
+            <el-radio label="10000-30000">1-3万</el-radio>
+            <el-radio label="30000-50000">3-5万</el-radio>
           </el-radio-group>
         </el-form-item>
         <div class="btn-container">
@@ -35,16 +46,20 @@
   </div>
 </template>
   
-  <script>
+<script>
 export default {
   name: "NinthPage",
   data() {
     return {
       form: {
         carChoice: "",
+        expectedEarnings: "",
       },
       rules: {
         carChoice: [
+          { required: true, message: "请选择一个选项", trigger: "change" },
+        ],
+        expectedEarnings: [
           { required: true, message: "请选择一个选项", trigger: "change" },
         ],
       },
@@ -61,14 +76,12 @@ export default {
           return false;
         }
       });
-      // console.log("表单提交:", this.form);
-      // this.$router.push({ name: "ThanksPage" }); // 跳转到下一个页面
     },
   },
 };
 </script>
   
-  <style scoped>
+<style scoped>
 h1 {
   color: #3498db; /* 浅蓝色 */
 }

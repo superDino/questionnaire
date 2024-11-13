@@ -20,7 +20,9 @@
               <p>
                 如果你的车现在<strong>{{ scenario.location }}</strong
                 >，剩余电量在<strong>{{ scenario.batteryLevel }}</strong
-                >之间，且有可以参与V2G的条件。
+                >之间，且有可以参与V2G的条件。<strong
+                  >已知当前充电费用为1元/度。</strong
+                >
               </p>
               <p>在此场景，您的选择是:</p>
               <el-form-item
@@ -37,20 +39,25 @@
                   v-model="form.choices[currentGroup * 3 + index]"
                   @change="handleChoiceChange(currentGroup * 3 + index)"
                 >
-                  <el-radio :label="'参与V2G，' + scenario.benefit"
+                  <el-radio :value="'参与V2G，' + scenario.benefit"
                     >参与V2G，<strong>{{ scenario.benefit }}</strong></el-radio
                   >
                   <el-radio
-                    :label="'参与V2G，没有任何收益，但会显示可以减15g碳'"
-                    >参与V2G，没有任何收益，但会显示可以减15g碳（不是最后真的碳量，只是一个提示的作用）</el-radio
+                    :value="
+                      '参与V2G，' +
+                      scenario.benefit +
+                      '，参与此次V2G可以帮助减碳15g'
+                    "
+                    >参与V2G，<strong>{{ scenario.benefit }}，</strong
+                    >参与此次V2G可以帮助减碳15g</el-radio
                   >
-                  <el-radio :label="'不参与V2G'">不参与V2G</el-radio>
+                  <el-radio :value="'不参与V2G'">不参与V2G</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item
                 v-if="
-                  form.choices[currentGroup * 3 + index] ===
-                  '参与V2G，没有任何收益，但会显示可以减15g碳'
+                  form.choices[currentGroup * 3 + index] !== '不参与V2G' &&
+                  form.choices[currentGroup * 3 + index] !== ''
                 "
                 :prop="'dischargeLevels.' + (currentGroup * 3 + index)"
                 :rules="[
@@ -70,7 +77,29 @@
                   show-input
                   :format-tooltip="formatTooltip"
                   @change="handleSliderChange(currentGroup * 3 + index)"
+                  type="info"
                 ></el-slider>
+                <p class="remaining-battery">
+                  剩余电量:
+                  {{ 100 - form.dischargeLevels[currentGroup * 3 + index] }}%
+                </p>
+              </el-form-item>
+              <el-form-item
+                v-if="form.choices[currentGroup * 3 + index] === '不参与V2G'"
+                :prop="'reasons.' + (currentGroup * 3 + index)"
+                :rules="[
+                  {
+                    required: true,
+                    message: '请填写不参与的具体原因',
+                    trigger: 'blur',
+                  },
+                ]"
+              >
+                <el-input
+                  type="textarea"
+                  v-model="form.reasons[currentGroup * 3 + index]"
+                  placeholder="请填写不参与的具体原因"
+                ></el-input>
               </el-form-item>
             </div>
           </div>
@@ -125,6 +154,7 @@ export default {
       form: {
         choices: Array(48).fill(""),
         dischargeLevels: Array(48).fill(0),
+        reasons: Array(48).fill(""),
       },
       rules: {
         choices: [
@@ -139,6 +169,13 @@ export default {
             required: true,
             message: "请选择可接受的最大放电程度",
             trigger: "change",
+          },
+        ],
+        reasons: [
+          {
+            required: true,
+            message: "请填写不参与的具体原因",
+            trigger: "blur",
           },
         ],
       },
@@ -169,10 +206,15 @@ export default {
         "停放在家里",
         "停放在公司",
         "停放在商场",
-        "处于紧急情况",
+        "需要应急供电，且就在附近",
       ];
-      const batteryLevels = ["100-80%", "80-50%", "50-30%"];
-      const benefits = ["没有奖励", "0.5元每度", "1元每度", "1.5元每度"];
+      const batteryLevels = ["100%左右", "80%左右", "50%左右"];
+      const benefits = [
+        "没有奖励",
+        "收益为0.5元每度",
+        "收益为1元每度",
+        "收益为1.5元每度",
+      ];
       const usedCombinations = new Set();
 
       // 打乱 locations 和 benefits 数组的顺序
@@ -182,10 +224,7 @@ export default {
       while (this.scenarios.length < 48) {
         for (const location of shuffledLocations) {
           for (const benefit of shuffledBenefits) {
-            const batteryLevelsShuffled = batteryLevels.sort(
-              () => Math.random() - 0.5
-            );
-            for (const batteryLevel of batteryLevelsShuffled) {
+            for (const batteryLevel of batteryLevels) {
               const combination = `${location}-${batteryLevel}-${benefit}`;
               if (!usedCombinations.has(combination)) {
                 usedCombinations.add(combination);
@@ -207,32 +246,15 @@ export default {
       for (let i = 0; i < this.scenarios.length; i += 3) {
         groupedScenarios.push(this.scenarios.slice(i, i + 3));
       }
-
-      // 确保每相邻两组的 location 不同
-      for (let i = 1; i < groupedScenarios.length; i++) {
-        if (
-          groupedScenarios[i][0].location ===
-          groupedScenarios[i - 1][0].location
-        ) {
-          // 找到一个不同的组进行交换
-          for (let j = i + 1; j < groupedScenarios.length; j++) {
-            if (
-              groupedScenarios[j][0].location !==
-              groupedScenarios[i - 1][0].location
-            ) {
-              [groupedScenarios[i], groupedScenarios[j]] = [
-                groupedScenarios[j],
-                groupedScenarios[i],
-              ];
-              break;
-            }
-          }
+      // groupedScenarios原本顺序是1-16，打乱顺序为[1,5,9,13,2,6,10,14,3,7,11,15,4,8,12,16]
+      let rearrangedScenarios = [];
+      for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+          rearrangedScenarios.push(groupedScenarios[i + j * 4]);
         }
       }
-
       // 将打乱顺序后的组重新展开为一个数组
-      this.scenarios = groupedScenarios.flat();
-      console.log("scenarios:", this.scenarios);
+      this.scenarios = rearrangedScenarios.flat();
     },
     handleNextGroup() {
       this.$refs.form.validate((valid) => {
@@ -288,13 +310,9 @@ export default {
             batteryLevel: this.scenarios[index].batteryLevel,
             benefit: this.scenarios[index].benefit,
             option: this.form.choices[index],
+            dischargeLevels: this.form.dischargeLevels[index],
+            noJionReason: this.form.reasons[index],
           };
-          if (
-            this.form.choices[index] ===
-            "参与V2G，没有任何收益，但会显示可以减15g碳"
-          ) {
-            data.dischargeLevels = `${this.form.dischargeLevels[index]}%`;
-          }
           this.allData.push(data);
         }
       }
@@ -307,7 +325,7 @@ export default {
           return require("@/assets/images/office.png");
         case "停放在商场":
           return require("@/assets/images/market.png");
-        case "处于紧急情况":
+        case "需要应急供电，且就在附近":
           return require("@/assets/images/emergency.png");
         default:
           return "";
@@ -317,15 +335,20 @@ export default {
       return `${val}%`;
     },
     handleSliderChange(index) {
-      if (this.form.dischargeLevels[index] > 20) {
-        this.$message.error("不能超过20%");
-        this.form.dischargeLevels[index] = 20;
+      if (100 - this.form.dischargeLevels[index] < 20) {
+        this.$message.error("剩余电量需要大于20%");
+        this.form.dischargeLevels[index] = 80; // 将放电程度设置为最大允许值
       }
     },
     handleChoiceChange(index) {
+      if (this.form.choices[index] === "不参与V2G") {
+        this.form.reasons[index] = ""; // 清空理由
+      } else {
+        this.form.reasons[index] = ""; // 清空理由
+      }
       if (
-        this.form.choices[index] !==
-        "参与V2G，没有任何收益，但会显示可以减15g碳"
+        this.form.choices[index] === "不参与V2G" ||
+        this.form.choices[index] === ""
       ) {
         this.form.dischargeLevels[index] = 0;
       }
@@ -398,5 +421,17 @@ strong {
 .attention-checkbox {
   display: flex;
   justify-content: center;
+}
+
+.remaining-battery {
+  color: red;
+}
+/* 自定义 el-slider 样式 */
+::v-deep .el-slider__bar {
+  background-color: #66cc66; /* 绿色滑块 */
+}
+
+::v-deep .el-slider__button {
+  border-color: green; /* 绿色边框 */
 }
 </style>
