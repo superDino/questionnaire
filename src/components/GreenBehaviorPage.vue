@@ -16,9 +16,9 @@
           prop="greenBehavior"
         >
           <el-radio-group v-model="form.greenBehavior">
-            <el-radio label="notConcerned">不太在意</el-radio>
-            <el-radio label="concerned">会在意</el-radio>
-            <el-radio label="veryConcerned">非常在意</el-radio>
+            <el-radio :value="'不太在意'">不太在意</el-radio>
+            <el-radio :value="'会在意'">会在意</el-radio>
+            <el-radio :value="'非常在意'">非常在意</el-radio>
           </el-radio-group>
         </el-form-item>
         <el-form-item
@@ -27,12 +27,12 @@
           prop="greenActions"
         >
           <el-checkbox-group v-model="form.greenActions">
-            <el-checkbox label="关注低碳新闻"></el-checkbox>
-            <el-checkbox label="回收一次性塑料瓶"></el-checkbox>
-            <el-checkbox label="垃圾分类"></el-checkbox>
-            <el-checkbox label="随手关灯"></el-checkbox>
-            <el-checkbox label="空调不低于26度"></el-checkbox>
-            <el-checkbox label="其他"></el-checkbox>
+            <el-checkbox :value="'关注低碳新闻'">关注低碳新闻</el-checkbox>
+            <el-checkbox :value="'回收一次性塑料瓶'">回收一次性塑料瓶</el-checkbox>
+            <el-checkbox :value="'垃圾分类'">垃圾分类</el-checkbox>
+            <el-checkbox :value="'随手关灯'">随手关灯</el-checkbox>
+            <el-checkbox :value="'空调不低于26度'">空调不低于26度</el-checkbox>
+            <el-checkbox :value="'其他'">其他</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
         <div class="btn-wrapper">
@@ -50,6 +50,7 @@ export default {
       form: {
         greenBehavior: "",
         greenActions: [],
+        uuid: localStorage.getItem("uuid"),
       },
       rules: {
         greenBehavior: [

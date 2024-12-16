@@ -4,12 +4,12 @@
       <h1>电动汽车车主参与V2G（车网互动）意愿调查</h1>
       <div class="researchers-info">
         <p>研究人员：</p>
-        <p class="bullet">韦玮博士，助理教授</p>
-        <p>香港科技大学（广州）智能交通学域、碳中和和气候变化学域</p>
-        <p>邮箱：wwei@hkust-gz.edu.cn</p>
         <p class="bullet">陈艺纯，硕士研究生</p>
         <p>香港科技大学（广州）智能交通学域</p>
         <p>邮箱：ychen458@connect.hkust-gz.edu.cn</p>
+        <p class="bullet">韦玮博士，助理教授</p>
+        <p>香港科技大学（广州）智能交通学域、碳中和和气候变化学域</p>
+        <p>邮箱：wwei@hkust-gz.edu.cn</p>
       </div>
       <h2>以下为该实验的知情同意书，请您认真阅读。</h2>
       <div class="scrollable-content">
@@ -64,19 +64,22 @@
 </template>
   
   <script>
+
 export default {
   data() {
     return {
       form: {
         name: "",
         date: new Date().toISOString().substr(0, 10), // 自动生成当前日期
+        uuid: localStorage.getItem("uuid") || "", // 从localStorage中获取uuid
       },
     };
   },
   methods: {
     submitConsent() {
       if (this.form.name && this.form.date) {
-        this.$router.push({ name: "V2gExplainPage" });
+        console.log(this.form);
+        this.$router.push({ name: "BasicInfoPage" });
       } else {
         this.$message.error("请填写完整的姓名和日期");
       }

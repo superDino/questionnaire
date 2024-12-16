@@ -69,7 +69,7 @@ export default {
       }, 1000);
     },
     navigateToSurvey() {
-      this.$router.push({ name: "BasicInfoPage" });
+      this.$router.push({ name: "V2gKnowledgePage" });
     },
   },
 };

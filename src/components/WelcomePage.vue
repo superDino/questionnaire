@@ -7,9 +7,17 @@
 </template>
   
   <script>
+  import { v4 as uuidv4 } from 'uuid';
 export default {
+  created() {
+    //保存uuid到本地  
+    if (!localStorage.getItem("uuid")) {
+      localStorage.setItem("uuid", uuidv4());
+    }
+  },
   methods: {
     navigateToHomePage() {
+      console.log(localStorage.getItem("uuid"));
       this.$router.push({ name: "ConditionPage" });
     },
   },

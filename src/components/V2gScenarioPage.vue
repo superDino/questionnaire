@@ -9,16 +9,21 @@
               alt="location image"
               class="location-image"
             />
+            <p class="location-hint">
+              当前场景：<strong>{{
+                getLocations(currentGroupScenarios[0].location)
+              }}</strong>
+            </p>
           </div>
           <div
             v-for="(scenario, index) in currentGroupScenarios"
             :key="index"
             class="scenario-content"
           >
-            <h2>问题 {{ currentGroup * 3 + index + 1 }}</h2>
+            <h2>问题 {{ currentGroup * 2 + index + 1 }}</h2>
             <div class="scenario-text">
               <p>
-                如果你的车现在<strong>{{ scenario.location }}</strong
+                如果<strong>{{ scenario.location }}</strong
                 >，剩余电量在<strong>{{ scenario.batteryLevel }}</strong
                 >之间，且有可以参与V2G的条件。<strong
                   >已知当前充电费用为1元/度。</strong
@@ -26,7 +31,7 @@
               </p>
               <p>在此场景，您的选择是:</p>
               <el-form-item
-                :prop="'choices.' + (currentGroup * 3 + index)"
+                :prop="'choices.' + (currentGroup * 2 + index)"
                 :rules="[
                   {
                     required: true,
@@ -36,8 +41,8 @@
                 ]"
               >
                 <el-radio-group
-                  v-model="form.choices[currentGroup * 3 + index]"
-                  @change="handleChoiceChange(currentGroup * 3 + index)"
+                  v-model="form.choices[currentGroup * 2 + index]"
+                  @change="handleChoiceChange(currentGroup * 2 + index)"
                 >
                   <el-radio :value="'参与V2G，' + scenario.benefit"
                     >参与V2G，<strong>{{ scenario.benefit }}</strong></el-radio
@@ -49,17 +54,17 @@
                       '，参与此次V2G可以帮助减碳15g'
                     "
                     >参与V2G，<strong>{{ scenario.benefit }}，</strong
-                    >参与此次V2G可以帮助减碳15g</el-radio
+                    >参与此次V2G可以帮助<strong>减碳15g</strong></el-radio
                   >
                   <el-radio :value="'不参与V2G'">不参与V2G</el-radio>
                 </el-radio-group>
               </el-form-item>
               <el-form-item
                 v-if="
-                  form.choices[currentGroup * 3 + index] !== '不参与V2G' &&
-                  form.choices[currentGroup * 3 + index] !== ''
+                  form.choices[currentGroup * 2 + index] !== '不参与V2G' &&
+                  form.choices[currentGroup * 2 + index] !== ''
                 "
-                :prop="'dischargeLevels.' + (currentGroup * 3 + index)"
+                :prop="'dischargeLevels.' + (currentGroup * 2 + index)"
                 :rules="[
                   {
                     required: true,
@@ -70,23 +75,24 @@
               >
                 <p>可接受的最大放电程度（为了保护电池，最低剩余电量为20%）</p>
                 <el-slider
-                  v-model="form.dischargeLevels[currentGroup * 3 + index]"
+                  v-model="form.dischargeLevels[currentGroup * 2 + index]"
                   :min="0"
                   :max="100"
-                  :step="1"
+                  :step="10"
+                  show-stops
                   show-input
                   :format-tooltip="formatTooltip"
-                  @change="handleSliderChange(currentGroup * 3 + index)"
+                  @change="handleSliderChange(currentGroup * 2 + index)"
                   type="info"
                 ></el-slider>
                 <p class="remaining-battery">
                   剩余电量:
-                  {{ 100 - form.dischargeLevels[currentGroup * 3 + index] }}%
+                  {{ 100 - form.dischargeLevels[currentGroup * 2 + index] }}%
                 </p>
               </el-form-item>
               <el-form-item
-                v-if="form.choices[currentGroup * 3 + index] === '不参与V2G'"
-                :prop="'reasons.' + (currentGroup * 3 + index)"
+                v-if="form.choices[currentGroup * 2 + index] === '不参与V2G'"
+                :prop="'reasons.' + (currentGroup * 2 + index)"
                 :rules="[
                   {
                     required: true,
@@ -95,10 +101,19 @@
                   },
                 ]"
               >
+                <el-checkbox-group
+                  type="textarea"
+                  v-model="form.reasons[currentGroup * 2 + index]"
+                >
+                  <el-checkbox :value="'放电收益少'">放电收益少</el-checkbox>
+                  <el-checkbox :value="'停车时间短'">停车时间短</el-checkbox>
+                  <el-checkbox :value="'其他'">其他</el-checkbox>
+                </el-checkbox-group>
                 <el-input
                   type="textarea"
-                  v-model="form.reasons[currentGroup * 3 + index]"
-                  placeholder="请填写不参与的具体原因"
+                  v-if="form.reasons[currentGroup * 2 + index].includes('其他')"
+                  v-model="form.otherReason"
+                  placeholder="请填写其他原因"
                 ></el-input>
               </el-form-item>
             </div>
@@ -109,14 +124,14 @@
             >上一页</el-button
           >
           <el-button
-            v-if="currentGroup < 15"
+            v-if="currentGroup < 11"
             type="primary"
             @click="handleNextGroup"
           >
             下一页
           </el-button>
           <el-button
-            v-if="currentGroup === 15"
+            v-if="currentGroup === 11"
             @click="handleComplete"
             type="primary"
             >完成</el-button
@@ -145,16 +160,16 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   data() {
     return {
       scenarios: [],
       form: {
-        choices: Array(48).fill(""),
-        dischargeLevels: Array(48).fill(0),
-        reasons: Array(48).fill(""),
+        choices: Array(24).fill(""),
+        dischargeLevels: Array(24).fill(0),
+        reasons: Array(24).fill([]),
+        otherReason: "",
       },
       rules: {
         choices: [
@@ -189,8 +204,8 @@ export default {
   computed: {
     currentGroupScenarios() {
       return this.scenarios.slice(
-        this.currentGroup * 3,
-        this.currentGroup * 3 + 3
+        this.currentGroup * 2,
+        this.currentGroup * 2 + 2
       );
     },
     isAttentionReminderVisible() {
@@ -203,12 +218,11 @@ export default {
   methods: {
     generateScenarios() {
       const locations = [
-        "停放在家里",
-        "停放在公司",
-        "停放在商场",
-        "需要应急供电，且就在附近",
+        "您的车现在停放在家或者公司",
+        "您的车现在停放在商场",
+        "现在需要应急供电，您的车就在附近",
       ];
-      const batteryLevels = ["100%左右", "80%左右", "50%左右"];
+      const batteryLevels = ["100%左右", "50%左右"];
       const benefits = [
         "没有奖励",
         "收益为0.5元每度",
@@ -221,7 +235,7 @@ export default {
       const shuffledLocations = locations.sort(() => Math.random() - 0.5);
       const shuffledBenefits = benefits.sort(() => Math.random() - 0.5);
 
-      while (this.scenarios.length < 48) {
+      while (this.scenarios.length < 24) {
         for (const location of shuffledLocations) {
           for (const benefit of shuffledBenefits) {
             for (const batteryLevel of batteryLevels) {
@@ -233,24 +247,24 @@ export default {
                   batteryLevel,
                   benefit,
                 });
-                if (this.scenarios.length >= 48) break;
+                if (this.scenarios.length >= 24) break;
               }
             }
-            if (this.scenarios.length >= 48) break;
+            if (this.scenarios.length >= 24) break;
           }
-          if (this.scenarios.length >= 48) break;
+          if (this.scenarios.length >= 24) break;
         }
       }
-      // 将 this.scenarios 每三个为一组
+      // 将 this.scenarios 每两个为一组
       const groupedScenarios = [];
-      for (let i = 0; i < this.scenarios.length; i += 3) {
-        groupedScenarios.push(this.scenarios.slice(i, i + 3));
+      for (let i = 0; i < this.scenarios.length; i += 2) {
+        groupedScenarios.push(this.scenarios.slice(i, i + 2));
       }
-      // groupedScenarios原本顺序是1-16，打乱顺序为[1,5,9,13,2,6,10,14,3,7,11,15,4,8,12,16]
+      // groupedScenarios原本顺序是1-12，打乱顺序为[1,4,7,10,2,5,8,11,3,6,9,12]
       let rearrangedScenarios = [];
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 4; j++) {
-          rearrangedScenarios.push(groupedScenarios[i + j * 4]);
+          rearrangedScenarios.push(groupedScenarios[i + j * 3]);
         }
       }
       // 将打乱顺序后的组重新展开为一个数组
@@ -261,7 +275,7 @@ export default {
         if (valid) {
           this.saveCurrentForm();
           this.saveGroupData();
-          if (this.currentGroup < 15) {
+          if (this.currentGroup < 11) {
             this.currentGroup++;
             this.restoreForm();
             if (this.currentGroup === 5 || this.currentGroup === 11) {
@@ -302,8 +316,8 @@ export default {
       }
     },
     saveGroupData() {
-      for (let i = 0; i < 3; i++) {
-        const index = this.currentGroup * 3 + i;
+      for (let i = 0; i < 2; i++) {
+        const index = this.currentGroup * 2 + i;
         if (this.scenarios[index]) {
           const data = {
             location: this.scenarios[index].location,
@@ -312,6 +326,8 @@ export default {
             option: this.form.choices[index],
             dischargeLevels: this.form.dischargeLevels[index],
             noJionReason: this.form.reasons[index],
+            otherNoJoinReason: this.form.otherReason,
+            uuid: localStorage.getItem("uuid"),
           };
           this.allData.push(data);
         }
@@ -319,14 +335,24 @@ export default {
     },
     getImage(location) {
       switch (location) {
-        case "停放在家里":
-          return require("@/assets/images/home.png");
-        case "停放在公司":
-          return require("@/assets/images/office.png");
-        case "停放在商场":
+        case "您的车现在停放在家或者公司":
+          return require("@/assets/images/homeOrOffice.png");
+        case "您的车现在停放在商场":
           return require("@/assets/images/market.png");
-        case "需要应急供电，且就在附近":
+        case "现在需要应急供电，您的车就在附近":
           return require("@/assets/images/emergency.png");
+        default:
+          return "";
+      }
+    },
+    getLocations(location) {
+      switch (location) {
+        case "您的车现在停放在家或者公司":
+          return "家或公司";
+        case "您的车现在停放在商场":
+          return "商场";
+        case "现在需要应急供电，您的车就在附近":
+          return "应急用电";
         default:
           return "";
       }
@@ -339,17 +365,29 @@ export default {
         this.$message.error("剩余电量需要大于20%");
         this.form.dischargeLevels[index] = 80; // 将放电程度设置为最大允许值
       }
+      // 当batteryLevels的值是50%时，dischargeLevels的值不能大于50
+      if (this.scenarios[index].batteryLevel === "50%左右") {
+        if (100 - this.form.dischargeLevels[index] > 50) {
+          this.form.dischargeLevels[index] = 50; // 将放电程度设置为最大允许值
+        }
+      }
+      
     },
     handleChoiceChange(index) {
-      if (this.form.choices[index] === "不参与V2G") {
-        this.form.reasons[index] = ""; // 清空理由
-      } else {
-        this.form.reasons[index] = ""; // 清空理由
-      }
+      this.form.reasons[index] = [];
       if (
         this.form.choices[index] === "不参与V2G" ||
         this.form.choices[index] === ""
       ) {
+        this.form.dischargeLevels[index] = 0;
+      }
+      if (this.scenarios[index].batteryLevel === "100%左右") {
+        this.form.dischargeLevels[index] = 0;
+      } else
+      if (this.scenarios[index].batteryLevel === "50%左右") {
+        this.form.dischargeLevels[index] = 50;
+      }
+      if (this.form.choices[index] === "不参与V2G") {
         this.form.dischargeLevels[index] = 0;
       }
     },
@@ -369,7 +407,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .content-box {
   text-align: left;
@@ -393,6 +430,11 @@ export default {
 .location-image {
   width: 340px;
   height: 140px;
+}
+.location-hint {
+  font-size: 1.5em; /* 调整字体大小 */
+  font-weight: bold; /* 加粗 */
+  margin-top: 10px; /* 增加与图片的间距 */
 }
 
 .scenario-text {
@@ -426,6 +468,7 @@ strong {
 .remaining-battery {
   color: red;
 }
+
 /* 自定义 el-slider 样式 */
 ::v-deep .el-slider__bar {
   background-color: #66cc66; /* 绿色滑块 */
@@ -434,4 +477,9 @@ strong {
 ::v-deep .el-slider__button {
   border-color: green; /* 绿色边框 */
 }
+.el-radio-group {
+  display: grid !important;
+}
 </style>
+
+
