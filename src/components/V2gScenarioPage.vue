@@ -134,6 +134,8 @@
             v-if="currentGroup === 11"
             @click="handleComplete"
             type="primary"
+            :loading="this.loading"
+            :disabled="this.loading"
             >完成</el-button
           >
         </div>
@@ -166,6 +168,7 @@ import api from '@/api';
 export default {
   data() {
     return {
+      loading: false,
       scenarios: [],
       form: {
         choices: Array(24).fill(""),
@@ -402,15 +405,19 @@ export default {
           console.log("表单结果:", this.allData);
           // 提交所有数据并跳转到下一页
           try {
+            this.loading = true;
             const response = await api.saveScenariosResult(this.allData);
             console.log(response);
             if (response.status === 200) {
+              this.loading = false;
               this.$router.push({ name: "BatteryInvestmentPage" });
             } else {
+              this.loading = false;
               this.$message.error(response.message);
             }
           } catch (error) {
             console.error(error);
+            this.loading = false;
             this.$message.error("提交失败，请稍后重试");
           }
         } else {

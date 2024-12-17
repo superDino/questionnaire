@@ -216,7 +216,8 @@
           </div>
         </draggable>
         <div class="btn-wrapper">
-          <el-button type="primary" @click="handleSubmit">下一步</el-button>
+          <el-button type="primary" @click="handleSubmit" :loading="this.loading"
+          :disabled="this.loading">下一步</el-button>
         </div>
       </el-form>
     </div>
@@ -233,6 +234,7 @@ export default {
   data() {
     return {
       drawer: false,
+      loading: false,
       group: "",
       form: {
         planSuccess: "",
@@ -310,15 +312,19 @@ export default {
         if (valid) {
           console.log("表单提交:", this.form);
           try {
+            this.loading = true;
             const response = await api.saveBasicInfo(this.form);
             console.log(response);
             if (response.status === 200) {
+              this.loading = false;
               this.$router.push({ name: "GreenBehaviorPage" });
             } else {
+              this.loading = false;
               this.$message.error(response.message);
             }
           } catch (error) {
             console.error(error);
+            this.loading = false;
             this.$message.error("提交失败，请稍后重试");
           }
         } else {

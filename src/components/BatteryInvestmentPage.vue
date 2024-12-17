@@ -42,7 +42,8 @@
           <el-input v-model="form.wechat" placeholder="请输入您的微信号"></el-input>
         </el-form-item>
         <div class="btn-container">
-          <el-button type="primary" @click="handleSubmit">结束答题</el-button>
+          <el-button type="primary" @click="handleSubmit" :loading="this.loading"
+          :disabled="this.loading">结束答题</el-button>
         </div>
       </el-form>
     </div>
@@ -56,6 +57,7 @@ export default {
   name: "NinthPage",
   data() {
     return {
+      loading: false,
       form: {
         carChoice: "",
         expectedEarnings: "",
@@ -81,15 +83,19 @@ export default {
         if (valid) {
           console.log("表单提交:", this.form);
           try {
+            this.loading = true;
             const response = await api.saveBasicInfo(this.form);
             console.log(response);
             if (response.status === 200) {
+              this.loading = false;
               this.$router.push({ name: "ThanksPage" }); // 跳转到下一个页面
             } else {
+              this.loading = false;
               this.$message.error(response.message);
             }
           } catch (error) {
             console.error(error);
+            this.loading = false;
             this.$message.error("提交失败，请稍后重试");
           }
         } else {

@@ -36,7 +36,8 @@
           </el-checkbox-group>
         </el-form-item>
         <div class="btn-wrapper">
-          <el-button type="primary" @click="handleSubmit">下一步</el-button>
+          <el-button type="primary" @click="handleSubmit" :loading="this.loading"
+          :disabled="this.loading">下一步</el-button>
         </div>
       </el-form>
     </div>
@@ -49,6 +50,7 @@ import api from '@/api';
 export default {
   data() {
     return {
+      loading: false,
       form: {
         greenBehavior: "",
         greenActions: [],
@@ -80,15 +82,19 @@ export default {
         if (valid) {
           console.log("表单提交:", this.form);
           try {
+            this
             const response = await api.saveBasicInfo(this.form);
             console.log(response);
             if (response.status === 200) {
+              this.loading = false;
               this.$router.push({ name: "V2gScenarioTipsPage" });
             } else {
+              this.loading = false;
               this.$message.error(response.message);
             }
           } catch (error) {
             console.error(error);
+            this.loading = false;
             this.$message.error("提交失败，请稍后重试");
           }
         } else {

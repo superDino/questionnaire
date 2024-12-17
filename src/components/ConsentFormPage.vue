@@ -55,7 +55,8 @@
         </el-form-item>
         <el-form-item>
           <div class="btn-container">
-            <el-button type="primary" @click="submitConsent">签署</el-button>
+            <el-button type="primary" @click="submitConsent" :loading="this.loading"
+            :disabled="this.loading">签署</el-button>
           </div>
         </el-form-item>
       </el-form>
@@ -75,6 +76,7 @@ export default {
         date: new Date().toISOString().substr(0, 10), // 自动生成当前日期
         uuid: localStorage.getItem("uuid") || "", // 从localStorage中获取uuid
       },
+      loading: false,
     };
   },
   methods: {
@@ -82,15 +84,19 @@ export default {
       if (this.form.name && this.form.date) {
         console.log(this.form);
         try {
+          this.loading = true;
           const response = await api.saveBasicInfo(this.form);
           console.log(response);
           if (response.status === 200) {
+            this.loading = false;
             this.$router.push({ name: "BasicInfoPage" });
           } else {
+            this.loading = false;
             this.$message.error(response.message);
           }
         } catch (error) {
           console.error(error);
+          this.loading = false;
           this.$message.error("提交失败，请稍后重试");
         }
       } else {
