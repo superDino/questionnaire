@@ -124,7 +124,13 @@
             <el-radio :value="1">非常不同意</el-radio>
             <el-radio :value="0">我不清楚</el-radio>
           </el-radio-group >
-          <el-radio-group required prop="emergencyPower" v-model="form.emergencyPower">
+        </el-form-item>
+        <el-form-item
+          label="可以当做应急电源来缓解紧急情况"
+          required
+          prop="emergencyPower"
+        >
+          <el-radio-group v-model="form.emergencyPower">
             <el-radio :value="5">非常同意</el-radio>
             <el-radio :value="4">同意</el-radio>
             <el-radio :value="3">中立</el-radio>
