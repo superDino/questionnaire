@@ -219,6 +219,8 @@
 </template>
 
 <script>
+import api from '@/api';
+
 export default {
   data() {
     return {
@@ -307,10 +309,21 @@ export default {
   },
   methods: {
     handleSubmit() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(async (valid) => {
         if (valid) {
           console.log("表单提交:", this.form);
-          this.$router.push({ name: "V2gExplainPage" });
+          try {
+            const response = await api.saveBasicInfo(this.form);
+            console.log(response);
+            if (response.status === 200) {
+              this.$router.push({ name: "V2gExplainPage" });
+            } else {
+              this.$message.error(response.message);
+            }
+          } catch (error) {
+            console.error(error);
+            this.$message.error("提交失败，请稍后重试");
+          }
         } else {
           console.log("表单验证失败");
           return false;

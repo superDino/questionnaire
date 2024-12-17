@@ -64,6 +64,8 @@
 </template>
   
   <script>
+import api from '@/api';
+
 
 export default {
   data() {
@@ -76,10 +78,21 @@ export default {
     };
   },
   methods: {
-    submitConsent() {
+    async submitConsent() {
       if (this.form.name && this.form.date) {
         console.log(this.form);
-        this.$router.push({ name: "BasicInfoPage" });
+        try {
+          const response = await api.saveBasicInfo(this.form);
+          console.log(response);
+          if (response.status === 200) {
+            this.$router.push({ name: "BasicInfoPage" });
+          } else {
+            this.$message.error(response.message);
+          }
+        } catch (error) {
+          console.error(error);
+          this.$message.error("提交失败，请稍后重试");
+        }
       } else {
         this.$message.error("请填写完整的姓名和日期");
       }

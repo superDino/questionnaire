@@ -112,7 +112,7 @@
                 <el-input
                   type="textarea"
                   v-if="form.reasons[currentGroup * 2 + index].includes('其他')"
-                  v-model="form.otherReason"
+                  v-model="form.otherReason[currentGroup * 2 + index]"
                   placeholder="请填写其他原因"
                 ></el-input>
               </el-form-item>
@@ -161,6 +161,8 @@
   </div>
 </template>
 <script>
+import api from '@/api';
+
 export default {
   data() {
     return {
@@ -169,7 +171,7 @@ export default {
         choices: Array(24).fill(""),
         dischargeLevels: Array(24).fill(0),
         reasons: Array(24).fill([]),
-        otherReason: "",
+        otherReason: Array(24).fill([]),
       },
       rules: {
         choices: [
@@ -209,7 +211,7 @@ export default {
       );
     },
     isAttentionReminderVisible() {
-      return this.currentGroup === 5 || this.currentGroup === 11;
+      return this.currentGroup === 5 || this.currentGroup === 9;
     },
   },
   created() {
@@ -278,7 +280,7 @@ export default {
           if (this.currentGroup < 11) {
             this.currentGroup++;
             this.restoreForm();
-            if (this.currentGroup === 5 || this.currentGroup === 11) {
+            if (this.currentGroup === 5 || this.currentGroup === 9) {
               this.attentionReminderVisible = true;
             }
           }
@@ -323,10 +325,10 @@ export default {
             location: this.scenarios[index].location,
             batteryLevel: this.scenarios[index].batteryLevel,
             benefit: this.scenarios[index].benefit,
-            option: this.form.choices[index],
+            optionContent : this.form.choices[index],
             dischargeLevels: this.form.dischargeLevels[index],
-            noJionReason: this.form.reasons[index],
-            otherNoJoinReason: this.form.otherReason,
+            noJoinReason: this.form.reasons[index],
+            otherNoJoinReason: this.form.otherReason[index],
             uuid: localStorage.getItem("uuid"),
           };
           this.allData.push(data);
@@ -375,6 +377,7 @@ export default {
     },
     handleChoiceChange(index) {
       this.form.reasons[index] = [];
+      this.form.otherReason[index] = ''
       if (
         this.form.choices[index] === "不参与V2G" ||
         this.form.choices[index] === ""
@@ -392,13 +395,24 @@ export default {
       }
     },
     handleComplete() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(async(valid) => {
         if (valid) {
           this.saveCurrentForm();
           this.saveGroupData();
           console.log("表单结果:", this.allData);
           // 提交所有数据并跳转到下一页
-          this.$router.push({ name: "BatteryInvestmentPage" });
+          try {
+            const response = await api.saveScenariosResult(this.allData);
+            console.log(response);
+            if (response.status === 200) {
+              this.$router.push({ name: "BatteryInvestmentPage" });
+            } else {
+              this.$message.error(response.message);
+            }
+          } catch (error) {
+            console.error(error);
+            this.$message.error("提交失败，请稍后重试");
+          }
         } else {
           this.$message.error("请完成所有题目");
         }
