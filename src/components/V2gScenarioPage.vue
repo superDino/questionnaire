@@ -77,17 +77,17 @@
                 <el-slider
                   v-model="form.dischargeLevels[currentGroup * 2 + index]"
                   :min="0"
-                  :max="100"
+                  :max="scenario.batteryLevel=='100%左右'?100:50"
                   :step="10"
                   show-stops
                   show-input
                   :format-tooltip="formatTooltip"
-                  @change="handleSliderChange(currentGroup * 2 + index)"
+                  @change="handleSliderChange(scenario.batteryLevel,currentGroup * 2 + index)"
                   type="info"
                 ></el-slider>
                 <p class="remaining-battery">
                   剩余电量:
-                  {{ 100 - form.dischargeLevels[currentGroup * 2 + index] }}%
+                  {{scenario.batteryLevel=='100%左右'? 100 - form.dischargeLevels[currentGroup * 2 + index] :50 - form.dischargeLevels[currentGroup * 2 + index] }}%
                 </p>
               </el-form-item>
               <el-form-item
@@ -365,18 +365,21 @@ export default {
     formatTooltip(val) {
       return `${val}%`;
     },
-    handleSliderChange(index) {
-      if (100 - this.form.dischargeLevels[index] < 20) {
+    handleSliderChange(batteryLevel, index) {
+      let maxBattery = batteryLevel == "100%左右" ? 100 : 50
+
+      if (maxBattery - this.form.dischargeLevels[index] < 20) {
         this.$message.error("剩余电量需要大于20%");
-        this.form.dischargeLevels[index] = 80; // 将放电程度设置为最大允许值
-      }
-      // 当batteryLevels的值是50%时，dischargeLevels的值不能大于50
-      if (this.scenarios[index].batteryLevel === "50%左右") {
-        if (100 - this.form.dischargeLevels[index] > 50) {
-          this.form.dischargeLevels[index] = 50; // 将放电程度设置为最大允许值
-        }
+        this.form.dischargeLevels[index] = maxBattery-20; // 将放电程度设置为最大允许值
       }
       
+    // 当batteryLevels的值是50%时，dischargeLevels的值不能大于50
+    // if (this.scenarios[index].batteryLevel === "50%左右") {
+    //   if (100 - this.form.dischargeLevels[index] > 50) {
+    //     this.form.dischargeLevels[index] = 50; // 将放电程度设置为最大允许值
+    //   }
+    // }
+
     },
     handleChoiceChange(index) {
       this.form.reasons[index] = [];
