@@ -394,7 +394,7 @@ export default {
         this.form.dischargeLevels[index] = 0;
       } else
       if (this.scenarios[index].batteryLevel === "50%左右") {
-        this.form.dischargeLevels[index] = 50;
+        this.form.dischargeLevels[index] = 0;
       }
       if (this.form.choices[index] === "不参与V2G") {
         this.form.dischargeLevels[index] = 0;
